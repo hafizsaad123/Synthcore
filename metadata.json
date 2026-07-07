@@ -1,0 +1,6 @@
+{
+  "name": "SynthCore",
+  "description": "An enterprise-grade AI Agent Operating System that coordinates, monitors, and optimizes autonomous agent networks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
