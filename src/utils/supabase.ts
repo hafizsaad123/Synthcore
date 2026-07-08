@@ -1,7 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || '';
-const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+// Support dynamic credentials stored in localStorage as well as env variables
+export const getSupabaseCredentials = () => {
+  let url = '';
+  let key = '';
+  try {
+    url = localStorage.getItem('synthcore_supabase_url') || '';
+    key = localStorage.getItem('synthcore_supabase_key') || '';
+  } catch (e) {
+    // SSR / non-browser fallback
+  }
+  
+  if (!url) {
+    url = (import.meta as any).env.VITE_SUPABASE_URL || '';
+  }
+  if (!key) {
+    key = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
+  }
+  return { 
+    url: url.trim(), 
+    key: key.trim(),
+    isCustom: !!(localStorage.getItem('synthcore_supabase_url') && localStorage.getItem('synthcore_supabase_key'))
+  };
+};
+
+const { url: supabaseUrl, key: supabaseKey } = getSupabaseCredentials();
 
 // Safely initialize the client to prevent crashing the application if keys are missing
 export const supabase = (supabaseUrl && supabaseKey)
@@ -12,6 +35,20 @@ export const supabase = (supabaseUrl && supabaseKey)
 export const isSupabaseConfigured = (): boolean => {
   return !!supabase;
 };
+
+export function saveSupabaseConfig(url: string, key: string) {
+  localStorage.setItem('synthcore_supabase_url', url.trim());
+  localStorage.setItem('synthcore_supabase_key', key.trim());
+  // Force a reload to apply changes instantly
+  window.location.reload();
+}
+
+export function clearSupabaseConfig() {
+  localStorage.removeItem('synthcore_supabase_url');
+  localStorage.removeItem('synthcore_supabase_key');
+  // Force a reload to apply changes instantly
+  window.location.reload();
+}
 
 // ==========================================
 // 1. ONBOARDING PROFILES & USERS

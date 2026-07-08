@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabase';
-import { Database, Plus, RefreshCw, Trash2, CheckCircle2, AlertTriangle, Play, Terminal } from 'lucide-react';
+import { supabase, getSupabaseCredentials, saveSupabaseConfig, clearSupabaseConfig } from '../../utils/supabase';
+import { Database, Plus, RefreshCw, Trash2, CheckCircle2, AlertTriangle, Play, Terminal, Key, Link2 } from 'lucide-react';
 
 interface Todo {
   id: number;
@@ -9,6 +9,11 @@ interface Todo {
 }
 
 export default function SupabaseSync() {
+  const credentials = getSupabaseCredentials();
+  const [inputUrl, setInputUrl] = useState(credentials.url);
+  const [inputKey, setInputKey] = useState(credentials.key);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,8 +21,21 @@ export default function SupabaseSync() {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
+  const supabaseUrl = credentials.url;
   const isClientConfigured = !!supabase;
+
+  const handleSaveCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputUrl.trim() || !inputKey.trim()) return;
+    saveSupabaseConfig(inputUrl.trim(), inputKey.trim());
+    setSaveSuccess(true);
+  };
+
+  const handleClearCredentials = () => {
+    clearSupabaseConfig();
+    setInputUrl('');
+    setInputKey('');
+  };
 
   // Mock data to fallback gracefully if the table doesn't exist in user's Supabase project yet
   const DEMO_TODOS: Todo[] = [
@@ -139,42 +157,90 @@ export default function SupabaseSync() {
         
         {/* CONNECTION CARD */}
         <div className="bg-white border border-brand-sand rounded-2xl p-5 shadow-sm lg:col-span-1 flex flex-col justify-between">
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <span className="text-[10px] font-bold text-brand-stone uppercase tracking-wider block">DATABASE ENGINE STATUS</span>
             
             {isClientConfigured ? (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-emerald-600 font-extrabold text-sm">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span>CONNECTED LIVE</span>
+                <div className="flex items-center gap-2 text-emerald-600 font-extrabold text-xs">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>CONNECTED TO SUPABASE</span>
                 </div>
-                <div className="font-mono text-[10px] text-brand-stone bg-brand-cream/60 border border-brand-sand/50 p-2.5 rounded-lg break-all leading-normal">
+                <div className="font-mono text-[9px] text-brand-stone bg-brand-cream/60 border border-brand-sand/50 p-2 rounded-lg break-all leading-normal">
                   <strong>URL:</strong> {supabaseUrl}
                 </div>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-amber-600 font-extrabold text-sm">
-                  <AlertTriangle className="w-5 h-5" />
-                  <span>MISSING CONFIGURATION</span>
+                <div className="flex items-center gap-2 text-amber-600 font-extrabold text-xs">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>OFFLINE / DEMO CACHE ACTIVE</span>
                 </div>
-                <p className="text-[11px] text-brand-stone leading-relaxed font-semibold">
-                  Environment credentials are empty. Please ensure your <code className="bg-brand-cream px-1 py-0.5 rounded border border-brand-sand">.env</code> contains your live Supabase keys.
-                </p>
               </div>
             )}
 
-            <div className="mt-4 border-t border-brand-cream pt-4 text-[11px] text-brand-stone leading-relaxed font-semibold">
+            {/* CREDENTIALS CONFIG FORM */}
+            <form onSubmit={handleSaveCredentials} className="flex flex-col gap-3 pt-3 border-t border-brand-cream">
+              <span className="text-[9px] font-bold text-brand-stone uppercase tracking-wider">CONGREGATE LIVE CREDENTIALS</span>
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-brand-chocolate flex items-center gap-1">
+                  <Link2 className="w-3 h-3 text-brand-stone" /> Supabase URL
+                </label>
+                <input
+                  type="text"
+                  value={inputUrl}
+                  onChange={(e) => setInputUrl(e.target.value)}
+                  placeholder="https://your-project.supabase.co"
+                  className="px-2.5 py-1.5 border border-brand-sand bg-brand-cream/40 rounded-lg text-[11px] font-semibold text-brand-chocolate focus:outline-none focus:border-brand-orange"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-brand-chocolate flex items-center gap-1">
+                  <Key className="w-3 h-3 text-brand-stone" /> Anon / Publishable Key
+                </label>
+                <input
+                  type="password"
+                  value={inputKey}
+                  onChange={(e) => setInputKey(e.target.value)}
+                  placeholder="eyJhbGciOi..."
+                  className="px-2.5 py-1.5 border border-brand-sand bg-brand-cream/40 rounded-lg text-[11px] font-semibold text-brand-chocolate focus:outline-none focus:border-brand-orange"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="submit"
+                  disabled={!inputUrl.trim() || !inputKey.trim()}
+                  className="flex-1 py-1.5 bg-brand-orange hover:bg-brand-orange-hover text-white rounded-lg font-bold text-[10px] text-center transition-colors cursor-pointer shadow-sm disabled:opacity-50"
+                >
+                  Connect Database
+                </button>
+                {credentials.isCustom && (
+                  <button
+                    type="button"
+                    onClick={handleClearCredentials}
+                    className="px-2 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-lg font-bold text-[10px] text-center transition-colors cursor-pointer"
+                    title="Revert to environment variables"
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            </form>
+
+            <div className="mt-2 border-t border-brand-cream pt-3 text-[10px] text-brand-stone leading-relaxed font-semibold">
               {isDemoMode ? (
-                <span className="text-amber-700 flex items-start gap-1.5 bg-amber-50 border border-amber-100 p-2.5 rounded-xl">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span className="text-amber-700 flex items-start gap-1.5 bg-amber-50 border border-amber-100 p-2 rounded-xl">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                   <span>
-                    <strong>Demo Mode Active:</strong> Reading simulated tasks. Ensure you have run the database setup scripts below.
+                    <strong>Demo Mode Active:</strong> Using local state cache. Fill the inputs above to connect a real Supabase database.
                   </span>
                 </span>
               ) : (
-                <span className="text-emerald-700 flex items-center gap-1.5 font-bold">
-                  <CheckCircle2 className="w-4 h-4" /> Live Connection Operational
+                <span className="text-emerald-700 flex items-center gap-1 font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Live Connection Operational
                 </span>
               )}
             </div>
@@ -184,9 +250,9 @@ export default function SupabaseSync() {
             <button
               onClick={fetchTodos}
               disabled={loading}
-              className="mt-6 w-full py-2.5 bg-brand-cream hover:bg-brand-sand/40 border border-brand-sand text-brand-chocolate font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
+              className="mt-4 w-full py-2 bg-brand-cream hover:bg-brand-sand/40 border border-brand-sand text-brand-chocolate font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
               {loading ? 'Refreshing...' : 'Refresh Live Data'}
             </button>
           )}
