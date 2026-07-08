@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { INITIAL_AI_TOOLS } from '../data/mockData';
 import { Check, ArrowRight, ArrowLeft, Layers, ShieldCheck, HelpCircle, Lock, X, User, ShieldAlert } from 'lucide-react';
 import ToolLogo from '../components/ToolLogo';
+import { saveOnboardingProfile, fetchOnboardingProfile } from '../utils/supabase';
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -131,7 +132,7 @@ export default function Onboarding() {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr);
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     setValidationError('');
     if (step === 1) {
       if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim() || !company.trim()) {
@@ -174,17 +175,54 @@ export default function Onboarding() {
       localStorage.setItem('synthcore_company', company.trim());
       localStorage.setItem('synthcore_email', email.trim().toLowerCase());
       localStorage.removeItem('synthcore_is_super');
+
+      // Sync with Supabase (profiles table)
+      await saveOnboardingProfile({
+        email: email.trim(),
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        company: company.trim(),
+        password: password
+      });
+    }
+    if (step === 2) {
+      const storedEmail = email.trim() || localStorage.getItem('synthcore_email') || '';
+      if (storedEmail) {
+        await saveOnboardingProfile({
+          email: storedEmail,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          company: company.trim(),
+          industry,
+          company_size: companySize,
+          ai_tool_count: aiToolCount
+        });
+      }
     }
     if (step === 3) {
       localStorage.setItem('synthcore_selected_tools', JSON.stringify(selectedTools));
+      const storedEmail = email.trim() || localStorage.getItem('synthcore_email') || '';
+      if (storedEmail) {
+        await saveOnboardingProfile({
+          email: storedEmail,
+          selected_tools: selectedTools
+        });
+      }
     }
     if (step === 4) {
       localStorage.setItem('synthcore_goal', goal);
+      const storedEmail = email.trim() || localStorage.getItem('synthcore_email') || '';
+      if (storedEmail) {
+        await saveOnboardingProfile({
+          email: storedEmail,
+          goal: goal
+        });
+      }
     }
     setStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
 
@@ -195,6 +233,32 @@ export default function Onboarding() {
     if (!isValidEmail(signinEmail)) {
       setValidationError('Please enter a valid work email address.');
       return;
+    }
+
+    // Try fetching from Supabase first
+    try {
+      const dbProfile = await fetchOnboardingProfile(signinEmail);
+      if (dbProfile && dbProfile.password === signinPassword) {
+        localStorage.setItem('synthcore_username', `${dbProfile.first_name || 'User'} ${dbProfile.last_name || ''}`.trim());
+        localStorage.setItem('synthcore_company', dbProfile.company || 'Personal Team');
+        localStorage.setItem('synthcore_email', dbProfile.email.trim().toLowerCase());
+        localStorage.setItem('synthcore_onboarded', 'true');
+        if (dbProfile.selected_tools) {
+          localStorage.setItem('synthcore_selected_tools', JSON.stringify(dbProfile.selected_tools));
+        }
+        if (dbProfile.goal) {
+          localStorage.setItem('synthcore_goal', dbProfile.goal);
+        }
+        if (dbProfile.is_super) {
+          localStorage.setItem('synthcore_is_super', 'true');
+        } else {
+          localStorage.removeItem('synthcore_is_super');
+        }
+        navigate('/dashboard');
+        return;
+      }
+    } catch (err) {
+      console.warn('Supabase profile login sync error:', err);
     }
 
     const storedUsers = JSON.parse(localStorage.getItem('synthcore_registered_users') || '[]');
@@ -339,8 +403,23 @@ export default function Onboarding() {
     );
   };
 
-  const handleLaunchDashboard = () => {
+  const handleLaunchDashboard = async () => {
     localStorage.setItem('synthcore_onboarded', 'true');
+    const userEmail = email.trim() || localStorage.getItem('synthcore_email') || '';
+    if (userEmail) {
+      await saveOnboardingProfile({
+        email: userEmail,
+        first_name: firstName,
+        last_name: lastName,
+        company: company,
+        industry,
+        company_size: companySize,
+        ai_tool_count: aiToolCount,
+        selected_tools: selectedTools,
+        goal: goal,
+        is_super: userEmail.toLowerCase() === 'admin@arxodyne.com'
+      });
+    }
     navigate('/dashboard');
   };
 
