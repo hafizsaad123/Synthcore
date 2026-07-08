@@ -22,6 +22,12 @@ import Integrations from './pages/dashboard/Integrations';
 import Settings from './pages/dashboard/Settings';
 import SuperAdmin from './pages/dashboard/SuperAdmin';
 
+// Dynamic Core Site Pages
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Docs from './pages/Docs';
+import SystemStatus from './pages/SystemStatus';
+
 function AppContent() {
   const navigate = useNavigate();
 
@@ -49,6 +55,10 @@ function AppContent() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/docs" element={<Docs />} />
+      <Route path="/status" element={<SystemStatus />} />
       
       {/* Dashboard with Persistent Sidebar and Layout Navigation */}
       <Route
