@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { SystemGoal } from '../../types';
 import { Plus, X, Target, Calendar, CheckSquare, Settings2, ShieldCheck } from 'lucide-react';
 
@@ -94,7 +94,7 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
         <div>
           <button
             onClick={() => setCreateOpen(true)}
-            className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Create Strategic Goal
           </button>
@@ -146,7 +146,7 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleToggleStatus(goal.id, goal.status)}
-                      className="px-2.5 py-1 bg-white hover:bg-neutral-50 text-neutral-600 border border-[#EAEAEA] rounded text-[11px] font-medium transition-colors"
+                      className="px-2.5 py-1 bg-white hover:bg-neutral-50 text-neutral-600 border border-[#EAEAEA] rounded text-[11px] font-medium transition-colors cursor-pointer"
                     >
                       {goal.status === 'paused' ? 'Activate' : 'Pause'}
                     </button>
@@ -155,7 +155,7 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
                         setAdjustingGoal(goal);
                         setTempProgress(goal.progress);
                       }}
-                      className="px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded text-[11px] font-bold transition-colors flex items-center gap-1"
+                      className="px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded text-[11px] font-bold transition-colors flex items-center gap-1 cursor-pointer"
                     >
                       <Settings2 className="w-3 h-3" /> Tweak Progress
                     </button>
@@ -203,7 +203,7 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
               </div>
               <button 
                 onClick={() => setCreateOpen(false)}
-                className="text-neutral-400 hover:text-black transition-colors"
+                className="text-neutral-400 hover:text-black transition-colors cursor-pointer"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
@@ -249,13 +249,13 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
             <div className="bg-neutral-50 border-t border-[#EAEAEA] px-5 py-4 flex items-center justify-end gap-2">
               <button
                 onClick={() => setCreateOpen(false)}
-                className="px-4 py-2 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors"
+                className="px-4 py-2 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateGoal}
-                className="px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors"
+                className="px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors cursor-pointer"
               >
                 Deploy Objective
               </button>
@@ -274,7 +274,7 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
               <span className="font-bold text-xs tracking-tight text-black uppercase font-mono">Tweak Progress Index</span>
               <button 
                 onClick={() => setAdjustingGoal(null)}
-                className="text-neutral-400 hover:text-black transition-colors"
+                className="text-neutral-400 hover:text-black transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -302,13 +302,13 @@ export default function Goals({ goals, setGoals, showToast, setActiveGoalText }:
             <div className="bg-neutral-50 border-t border-[#EAEAEA] px-5 py-4 flex items-center justify-end gap-2">
               <button
                 onClick={() => setAdjustingGoal(null)}
-                className="px-3.5 py-1.5 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors"
+                className="px-3.5 py-1.5 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProgress}
-                className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors"
+                className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors cursor-pointer"
               >
                 Save Progress
               </button>

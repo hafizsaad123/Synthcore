@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Agent, Decision, AlertItem, ConnectedTool } from '../../types';
 import { 
   ShieldAlert, 
@@ -38,6 +38,33 @@ export default function SuperAdmin({
   setConnectedTools,
   showToast
 }: SuperAdminProps) {
+  const userEmail = (localStorage.getItem('synthcore_email') || '').trim().toLowerCase();
+  const isEmailAuthorized = userEmail === 'admin@arxodyne.com';
+
+  // Passcode unlock guard
+  const isSuperAdmin = isEmailAuthorized && (localStorage.getItem('synthcore_is_super') === 'true' || localStorage.getItem('synthcore_username') === 'Super Admin');
+  const [passcode, setPasscode] = useState('');
+  const [isUnlocked, setIsUnlocked] = useState(isSuperAdmin);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isEmailAuthorized) {
+      setErrorMsg('ACCESS DENIED: Account is unauthorized.');
+      showToast('Access Denied: Unauthorized account email', true);
+      return;
+    }
+
+    if (passcode === 'admin123' || passcode === '1337' || passcode === 'arxodyne2026') {
+      setIsUnlocked(true);
+      localStorage.setItem('synthcore_is_super', 'true');
+      showToast('Super Admin Override Auth Unlocked!', false);
+    } else {
+      setErrorMsg('Invalid authorization passcode.');
+      showToast('Access Denied: Invalid Key', true);
+    }
+  };
+
   // 1. Simulation Controls State
   const [simulatedCpuLoad, setSimulatedCpuLoad] = useState(67);
   const [schedulerDelay, setSchedulerDelay] = useState(143);
@@ -225,6 +252,82 @@ export default function SuperAdmin({
     }
     showToast('Kernel configuration compiled and loaded to flash memory.');
   };
+
+  if (!isUnlocked) {
+    if (!isEmailAuthorized) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center animate-in fade-in duration-200">
+          <div className="bg-white border border-red-200 rounded-md p-8 shadow-sm max-w-sm w-full">
+            <div className="flex flex-col gap-6 items-center">
+              <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-red-600">
+                <ShieldAlert className="w-5 h-5 animate-pulse" />
+              </div>
+              
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] text-red-600 font-mono font-bold tracking-wider uppercase">ROOT ACCESS DENIED</span>
+                <h2 className="text-lg font-bold text-black tracking-tight">Security Block Active</h2>
+                <p className="text-xs text-neutral-500 leading-normal">
+                  Your logged-in account (<code className="bg-neutral-50 px-1 py-0.5 rounded font-mono font-bold text-red-600 text-[11px]">{userEmail || 'guest'}</code>) is not on the authorized system administrator register.
+                </p>
+                <p className="text-[10px] text-neutral-400 font-mono mt-2 leading-normal">
+                  This unauthorized attempt has been logged with system telemetry. Please authenticate with a secure administrator account.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+        <div className="bg-white border border-[#EAEAEA] rounded-md p-8 shadow-sm max-w-sm w-full">
+          <div className="flex flex-col gap-6 items-center">
+            <div className="w-12 h-12 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-red-600">
+              <Lock className="w-5 h-5" />
+            </div>
+            
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] text-red-600 font-mono font-bold tracking-wider uppercase">SECURE AREA LOCKED</span>
+              <h2 className="text-lg font-bold text-black tracking-tight">Super Admin Override</h2>
+              <p className="text-xs text-neutral-500 leading-normal">
+                This console accesses raw operational kernel configs and system-wide overrides. Authorized credentials are required.
+              </p>
+            </div>
+
+            <form onSubmit={handleUnlock} className="w-full flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5 text-left">
+                <label className="text-[9px] font-mono font-bold text-neutral-500 uppercase">ENTER SECURITY DEPLOYMENT PASSCODE</label>
+                <input
+                  type="password"
+                  value={passcode}
+                  onChange={(e) => {
+                    setPasscode(e.target.value);
+                    setErrorMsg('');
+                  }}
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 text-sm border border-[#EAEAEA] rounded focus:outline-none focus:border-red-500 font-mono tracking-widest text-center"
+                />
+                {errorMsg && (
+                  <span className="text-[10px] text-red-600 font-mono mt-1 font-bold">{errorMsg}</span>
+                )}
+                <span className="text-[9px] text-neutral-400 font-mono mt-2 leading-normal text-center block">
+                  Hint: Passcodes are <code className="bg-neutral-100 px-1 py-0.5 rounded text-neutral-600 font-bold">admin123</code> or <code className="bg-neutral-100 px-1 py-0.5 rounded text-neutral-600 font-bold">1337</code>
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1.5"
+              >
+                Authenticate Override
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">

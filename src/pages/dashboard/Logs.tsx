@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Decision } from '../../types';
 import { Search, Trash2, Sliders, Calendar, Terminal } from 'lucide-react';
 
@@ -53,7 +53,7 @@ export default function Logs({ decisions, setDecisions, showToast }: LogsProps) 
         <div>
           <button
             onClick={handleClearLogs}
-            className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-semibold rounded transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-semibold rounded transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Trash2 className="w-4 h-4" /> Clear Decision Logs
           </button>
@@ -91,7 +91,7 @@ export default function Logs({ decisions, setDecisions, showToast }: LogsProps) 
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black font-mono text-[10px]"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black font-mono text-[10px] cursor-pointer"
               >
                 CLEAR
               </button>

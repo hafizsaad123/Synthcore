@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Cpu, 
@@ -11,17 +12,65 @@ import {
   ArrowRight,
   TrendingUp,
   Sliders,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  X
 } from 'lucide-react';
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPasscode, setAdminPasscode] = useState('');
+  const [adminError, setAdminError] = useState('');
+
+  const handleAdminAccess = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminError('');
+
+    const emailInput = adminEmail.trim().toLowerCase();
+    const allowedEmails = ['admin@arxodyne.com'];
+    const allowedPasscodes = ['admin123', '1337', 'arxodyne2026', 'password123'];
+
+    if (!emailInput) {
+      setAdminError('Please enter an authorized email address.');
+      return;
+    }
+
+    if (!allowedEmails.includes(emailInput)) {
+      setAdminError('ACCESS DENIED: Email is not registered as an authorized system administrator.');
+      return;
+    }
+
+    if (!adminPasscode) {
+      setAdminError('Please enter the security override passcode.');
+      return;
+    }
+
+    if (!allowedPasscodes.includes(adminPasscode)) {
+      setAdminError('ACCESS DENIED: Security override passcode does not match.');
+      return;
+    }
+
+    // Success! Setup secure session variables
+    localStorage.setItem('synthcore_onboarded', 'true');
+    localStorage.setItem('synthcore_is_super', 'true');
+    localStorage.setItem('synthcore_username', 'Saad');
+    localStorage.setItem('synthcore_company', 'Arxodyne Global HQ');
+    localStorage.setItem('synthcore_email', emailInput);
+    localStorage.setItem('synthcore_goal', 'Optimize global failover routing and compile kernel micro-configs');
+    localStorage.setItem('synthcore_selected_tools', JSON.stringify(['custom_api', 'slack', 'notion']));
+    
+    setIsAdminModalOpen(false);
+    navigate('/dashboard/super-admin');
+  };
+
   const plans = [
     {
       name: 'Starter Network',
-      price: '$149',
-      cta: 'Start Starter Network',
+      price: 'Free',
+      cta: 'Start for Free',
       featured: false,
       features: [
         'Deploy up to 5 agent nodes',
@@ -71,36 +120,42 @@ export default function LandingPage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-neutral-600 font-medium">
-            <a href="#features" className="hover:text-black transition-colors">Features</a>
-            <a href="#architecture" className="hover:text-black transition-colors">Architecture</a>
-            <a href="#pricing" className="hover:text-black transition-colors">Pricing</a>
+            <button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-black transition-colors cursor-pointer">Features</button>
+            <button onClick={() => document.getElementById('architecture')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-black transition-colors cursor-pointer">Architecture</button>
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-black transition-colors cursor-pointer">Pricing</button>
           </nav>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/onboarding')}
-              className="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-md transition-all duration-150 shadow-sm active:scale-98"
+              className="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-4 py-2 rounded-md transition-all duration-150 shadow-sm active:scale-98 cursor-pointer"
             >
-              Launch Console
+              Start for Free
+            </button>
+            <button
+              onClick={() => navigate('/onboarding', { state: { mode: 'signin' } })}
+              className="border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-xs font-semibold px-3.5 py-2 rounded-md transition-all duration-150 cursor-pointer active:scale-98"
+            >
+              Log In
             </button>
           </div>
         </div>
       </header>
 
-      {/* 1.2 HERO SECTION (Geist Stark Black) */}
-      <section className="relative overflow-hidden bg-black text-white py-24 md:py-32 border-b border-neutral-900">
-        <div className="absolute inset-0 bg-[radial-gradient(#111_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
+      {/* 1.2 HERO SECTION (Geist Stark White) */}
+      <section className="relative overflow-hidden bg-white text-neutral-900 py-24 md:py-32 border-b border-[#EAEAEA]">
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e5e5_1px,transparent_1px)] [background-size:16px_16px] opacity-70"></div>
         <div className="max-w-5xl mx-auto px-6 relative z-10 text-center flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-800 bg-neutral-950/80 text-xs text-neutral-400 font-mono mb-8 backdrop-blur">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neutral-200 bg-neutral-50 text-xs text-neutral-600 font-mono mb-8 backdrop-blur">
+            <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
             Now in Public Beta: Arxodyne v1.4
           </div>
 
-          <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] mb-6">
-            One Brain. <span className="text-neutral-400">Every AI Agent.</span> <span className="text-neutral-500">Zero Chaos.</span>
+          <h1 className="text-4xl md:text-7xl font-extrabold tracking-tight text-neutral-900 max-w-4xl leading-[1.1] mb-6">
+            One Brain. <span className="text-neutral-500">Every AI Agent.</span> <span className="text-neutral-400">Zero Chaos.</span>
           </h1>
 
-          <p className="text-neutral-400 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">
+          <p className="text-neutral-500 text-lg md:text-xl max-w-2xl leading-relaxed mb-10">
             Arxodyne is the operating system that sits above all your AI tools 
             and coordinates them into a single, unified intelligent grid—autonomously.
           </p>
@@ -108,26 +163,19 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center mb-12">
             <button
               onClick={() => navigate('/onboarding')}
-              className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black text-sm font-semibold px-8 py-3.5 rounded-md transition-all duration-150 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-black hover:bg-neutral-800 text-white text-sm font-semibold px-8 py-3.5 rounded-md transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"
             >
               Start for Free <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => {
-                localStorage.setItem('synthcore_onboarded', 'true');
-                localStorage.setItem('synthcore_username', 'Super Admin');
-                localStorage.setItem('synthcore_company', 'Arxodyne Global HQ');
-                localStorage.setItem('synthcore_goal', 'Optimize global failover routing and compile kernel micro-configs');
-                localStorage.setItem('synthcore_selected_tools', JSON.stringify(['custom_api', 'slack', 'notion']));
-                navigate('/dashboard/super-admin');
-              }}
-              className="w-full sm:w-auto bg-neutral-950 hover:bg-neutral-900 text-neutral-300 border border-neutral-800 text-sm font-mono font-bold px-8 py-3.5 rounded-md transition-all duration-150 flex items-center justify-center gap-2"
+              onClick={() => navigate('/onboarding', { state: { mode: 'signin' } })}
+              className="w-full sm:w-auto border border-neutral-200 hover:bg-neutral-50 text-neutral-800 text-sm font-semibold px-8 py-3.5 rounded-md transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer"
             >
-              ⚡ Super Admin Portal
+              Log In
             </button>
           </div>
 
-          <div className="text-neutral-500 text-xs font-mono">
+          <div className="text-neutral-400 text-xs font-mono">
             No credit card required · Free 14-day trial · Standard SLA
           </div>
         </div>
@@ -312,7 +360,7 @@ export default function LandingPage() {
                   <h3 className="text-xl font-bold text-black">{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mt-4">
                     <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
-                    {plan.price !== 'Custom' && <span className="text-sm text-neutral-400 font-mono">/mo</span>}
+                    {plan.price !== 'Custom' && plan.price !== 'Free' && <span className="text-sm text-neutral-400 font-mono">/mo</span>}
                   </div>
                 </div>
 
@@ -359,11 +407,98 @@ export default function LandingPage() {
             <span className="hover:text-black cursor-pointer transition-colors">Documentation</span>
           </div>
 
-          <div className="font-mono text-[11px] text-neutral-400">
+          <div className="font-mono text-[11px] text-neutral-400 flex items-center gap-1.5">
             © 2026 Arxodyne Technologies, Inc. All rights reserved.
+            <button
+              onClick={() => {
+                setIsAdminModalOpen(true);
+                setAdminEmail('');
+                setAdminPasscode('');
+                setAdminError('');
+              }}
+              className="p-1 hover:text-black opacity-30 hover:opacity-100 transition-all cursor-pointer rounded"
+              title="Secure Gateway"
+            >
+              <Lock className="w-3 h-3" />
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* SECURE ADMIN GATEWAY MODAL OVERLAY */}
+      {isAdminModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div 
+            className="bg-white border border-[#EAEAEA] rounded-lg shadow-xl w-full max-w-md overflow-hidden relative animate-in zoom-in-95 duration-200 text-left"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#F0F0F0] flex items-center justify-between">
+              <div className="flex items-center gap-2 text-black">
+                <Lock className="w-5 h-5 text-black" />
+                <h3 className="font-bold text-base tracking-tight">Secure Admin Gateway</h3>
+              </div>
+              <button 
+                onClick={() => setIsAdminModalOpen(false)}
+                className="p-1.5 hover:bg-neutral-100 rounded text-neutral-400 hover:text-black transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <form onSubmit={handleAdminAccess} className="p-6 flex flex-col gap-4">
+              <p className="text-xs text-neutral-500 leading-relaxed">
+                Unauthorized access is strictly prohibited. Enter authorized administrator credentials to establish a secure root override session.
+              </p>
+
+              {adminError && (
+                <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded text-xs font-mono font-medium leading-normal">
+                  ⚠️ {adminError}
+                </div>
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Admin Email</label>
+                <input
+                  type="email"
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  placeholder="admin@arxodyne.com"
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded px-3 py-2 text-xs focus:bg-white focus:ring-1 focus:ring-black focus:border-black outline-none transition-all font-mono"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Security Passcode</label>
+                <input
+                  type="password"
+                  required
+                  value={adminPasscode}
+                  onChange={(e) => setAdminPasscode(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded px-3 py-2 text-xs focus:bg-white focus:ring-1 focus:ring-black focus:border-black outline-none transition-all font-mono"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-black hover:bg-neutral-800 text-white text-xs font-semibold py-2.5 rounded transition-colors flex items-center justify-center gap-2 cursor-pointer mt-2"
+              >
+                Establish Root Override <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </form>
+
+            <div className="px-6 py-4 bg-neutral-50 border-t border-[#F0F0F0] text-center">
+              <span className="text-[10px] font-mono text-neutral-400">
+                IP logged · Encrypted v2 Session
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

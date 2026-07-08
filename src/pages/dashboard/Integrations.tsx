@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ConnectedTool } from '../../types';
 import { Link2, Unlink, Check, Key, ShieldCheck, X } from 'lucide-react';
 import ToolLogo from '../../components/ToolLogo';
@@ -104,14 +104,14 @@ export default function Integrations({
               {tool.connected ? (
                 <button
                   onClick={() => handleDisconnect(tool.id, tool.name)}
-                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-[11px] font-bold rounded transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-[11px] font-bold rounded transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <Unlink className="w-3 h-3" /> Disconnect
                 </button>
               ) : (
                 <button
                   onClick={() => handleOpenConnectModal(tool)}
-                  className="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white text-[11px] font-bold rounded transition-colors flex items-center gap-1"
+                  className="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white text-[11px] font-bold rounded transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <Link2 className="w-3 h-3" /> Configure Key
                 </button>
@@ -134,7 +134,7 @@ export default function Integrations({
               </div>
               <button 
                 onClick={() => setSelectedTool(null)}
-                className="text-neutral-400 hover:text-black transition-colors"
+                className="text-neutral-400 hover:text-black transition-colors cursor-pointer"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
@@ -179,13 +179,13 @@ export default function Integrations({
             <div className="bg-neutral-50 border-t border-[#EAEAEA] px-5 py-4 flex items-center justify-end gap-2">
               <button
                 onClick={() => setSelectedTool(null)}
-                className="px-4 py-2 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors"
+                className="px-4 py-2 bg-white hover:bg-neutral-100 border border-[#EAEAEA] rounded text-xs font-semibold text-neutral-700 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveConnection}
-                className="px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors"
+                className="px-4 py-2 bg-black hover:bg-neutral-800 text-white rounded text-xs font-semibold transition-colors cursor-pointer"
               >
                 Save & Open Secure Tunnel
               </button>

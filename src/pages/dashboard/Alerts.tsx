@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { AlertItem, Agent, Decision } from '../../types';
 import { ShieldCheck, AlertTriangle, Play, CheckCircle2, History } from 'lucide-react';
 
@@ -125,7 +125,7 @@ export default function Alerts({
 
                   <button
                     onClick={() => handleResolveAlert(alert.id, alert.agentId)}
-                    className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white text-[11px] font-bold rounded transition-colors"
+                    className="px-3.5 py-1.5 bg-black hover:bg-neutral-800 text-white text-[11px] font-bold rounded transition-colors cursor-pointer"
                   >
                     Resolve Alert & Re-Launch Node
                   </button>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -15,7 +15,9 @@ import {
   Bell,
   CheckCircle,
   AlertOctagon,
-  ShieldAlert
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { Agent, Decision, ConnectedTool, AlertItem, SystemGoal } from '../types';
 
@@ -69,9 +71,26 @@ export default function Dashboard({
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('synthcore_sidebar_collapsed') === 'true';
+  });
 
-  // Synchronize onboarding inputs initially
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => {
+      const newVal = !prev;
+      localStorage.setItem('synthcore_sidebar_collapsed', String(newVal));
+      return newVal;
+    });
+  };
+
+  // Check if onboarded / authenticated!
   useEffect(() => {
+    const onboarded = localStorage.getItem('synthcore_onboarded');
+    if (!onboarded) {
+      navigate('/onboarding');
+      return;
+    }
+
     const obUsername = localStorage.getItem('synthcore_username');
     const obCompany = localStorage.getItem('synthcore_company');
     const obGoal = localStorage.getItem('synthcore_goal');
@@ -98,14 +117,23 @@ export default function Dashboard({
         console.error('Error parsing onboarding tools', e);
       }
     }
-  }, []);
+
+    // Guard Super Admin Route
+    const userEmail = (localStorage.getItem('synthcore_email') || '').trim().toLowerCase();
+    const isSuper = userEmail === 'admin@arxodyne.com' && localStorage.getItem('synthcore_is_super') === 'true';
+    if (location.pathname.includes('/super-admin') && !isSuper) {
+      navigate('/dashboard');
+    }
+  }, [navigate, location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('synthcore_onboarded');
     localStorage.removeItem('synthcore_username');
+    localStorage.removeItem('synthcore_email');
     localStorage.removeItem('synthcore_company');
     localStorage.removeItem('synthcore_goal');
     localStorage.removeItem('synthcore_selected_tools');
+    localStorage.removeItem('synthcore_is_super');
     navigate('/');
   };
 
@@ -142,6 +170,9 @@ export default function Dashboard({
     }
   ];
 
+  const userEmail = (localStorage.getItem('synthcore_email') || '').trim().toLowerCase();
+  const isSuperAdmin = userEmail === 'admin@arxodyne.com' && localStorage.getItem('synthcore_is_super') === 'true';
+
   const navItemsConfig = [
     {
       path: '/dashboard/integrations',
@@ -155,12 +186,12 @@ export default function Dashboard({
       icon: Settings,
       badge: null
     },
-    {
+    ...(isSuperAdmin ? [{
       path: '/dashboard/super-admin',
       label: 'Super Admin Override',
       icon: ShieldAlert,
       badge: 'ROOT'
-    }
+    }] : [])
   ];
 
   const initials = username
@@ -175,7 +206,7 @@ export default function Dashboard({
         <div className="flex items-center gap-3">
           <button 
             onClick={() => setMobileNavOpen(!mobileNavOpen)}
-            className="md:hidden p-1.5 hover:bg-neutral-100 rounded transition-colors text-neutral-600"
+            className="md:hidden p-1.5 hover:bg-neutral-100 rounded transition-colors text-neutral-600 cursor-pointer"
           >
             {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -186,6 +217,15 @@ export default function Dashboard({
             </div>
             <span className="font-bold text-sm tracking-tight hidden sm:inline">Arxodyne OS</span>
           </div>
+
+          {/* Desktop Collapsible Sidebar Toggle */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden md:flex p-1.5 hover:bg-neutral-100 rounded transition-colors text-neutral-600 cursor-pointer"
+            title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {sidebarCollapsed ? <ChevronRight className="w-4 h-4 text-neutral-500" /> : <ChevronLeft className="w-4 h-4 text-neutral-500" />}
+          </button>
         </div>
 
         <div className="flex items-center gap-4">
@@ -197,7 +237,7 @@ export default function Dashboard({
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2.5 p-1 px-2.5 hover:bg-neutral-50 rounded-md transition-colors border border-transparent hover:border-[#EAEAEA] text-left"
+              className="flex items-center gap-2.5 p-1 px-2.5 hover:bg-neutral-50 rounded-md transition-colors border border-transparent hover:border-[#EAEAEA] text-left cursor-pointer"
             >
               <div className="w-6 h-6 rounded-full bg-black text-white text-[10px] font-bold flex items-center justify-center font-mono">
                 {initials}
@@ -211,7 +251,7 @@ export default function Dashboard({
 
             {userMenuOpen && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)}></div>
+                <div className="fixed inset-0 z-40 cursor-default" onClick={() => setUserMenuOpen(false)}></div>
                 <div className="absolute right-0 mt-1 w-52 bg-white border border-[#EAEAEA] rounded-md shadow-lg z-50 py-1 divide-y divide-[#EAEAEA] animate-in fade-in duration-100">
                   <div className="px-3 py-2">
                     <p className="text-xs font-bold text-neutral-800">{username}</p>
@@ -223,19 +263,21 @@ export default function Dashboard({
                         setUserMenuOpen(false);
                         navigate('/dashboard/settings');
                       }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 hover:text-black transition-colors"
+                      className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 hover:text-black transition-colors cursor-pointer"
                     >
                       Profile & Settings
                     </button>
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        navigate('/dashboard/super-admin');
-                      }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 hover:text-black font-semibold transition-colors flex items-center gap-1"
-                    >
-                      ⚡ Super Admin Override
-                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          navigate('/dashboard/super-admin');
+                        }}
+                        className="w-full text-left px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 hover:text-black font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        ⚡ Super Admin Override
+                      </button>
+                    )}
                   </div>
                   <div className="py-1">
                     <button
@@ -243,7 +285,7 @@ export default function Dashboard({
                         setUserMenuOpen(false);
                         handleLogout();
                       }}
-                      className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" /> Log Out
                     </button>
@@ -259,11 +301,15 @@ export default function Dashboard({
       <div className="flex flex-1 relative">
         
         {/* SIDEBAR NAVIGATION - DESKTOP */}
-        <aside className="hidden md:flex flex-col w-64 bg-white border-r border-[#EAEAEA] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
-          <div className="p-4 flex flex-col gap-6 flex-1">
+        <aside className={`hidden md:flex flex-col ${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-[#EAEAEA] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto transition-all duration-300`}>
+          <div className={`p-4 ${sidebarCollapsed ? 'px-2' : ''} flex flex-col gap-6 flex-1`}>
             
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-mono font-bold text-neutral-400 tracking-wider uppercase px-2">COMMAND CENTER</span>
+              {sidebarCollapsed ? (
+                <div className="h-px bg-neutral-200 my-1.5 mx-2" />
+              ) : (
+                <span className="text-[10px] font-mono font-bold text-neutral-400 tracking-wider uppercase px-2">COMMAND CENTER</span>
+              )}
               <nav className="flex flex-col gap-0.5">
                 {navItemsCommand.map((item) => {
                   const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/dashboard/');
@@ -272,17 +318,18 @@ export default function Dashboard({
                     <button
                       key={item.path}
                       onClick={() => navigate(item.path)}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      title={sidebarCollapsed ? `${item.label}${item.badge ? ` (${item.badge})` : ''}` : undefined}
+                      className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-1' : 'justify-between px-2.5'} py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-neutral-100 text-black font-semibold'
                           : 'text-neutral-600 hover:bg-neutral-50 hover:text-black'
                       }`}
                     >
                       <span className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-neutral-400'}`} />
-                        {item.label}
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-black' : 'text-neutral-400'}`} />
+                        {!sidebarCollapsed && <span>{item.label}</span>}
                       </span>
-                      {item.badge && (
+                      {!sidebarCollapsed && item.badge && (
                         <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full font-bold ${
                           isActive ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600'
                         }`}>
@@ -296,7 +343,11 @@ export default function Dashboard({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-mono font-bold text-neutral-400 tracking-wider uppercase px-2">CONFIGURATION</span>
+              {sidebarCollapsed ? (
+                <div className="h-px bg-neutral-200 my-1.5 mx-2" />
+              ) : (
+                <span className="text-[10px] font-mono font-bold text-neutral-400 tracking-wider uppercase px-2">CONFIGURATION</span>
+              )}
               <nav className="flex flex-col gap-0.5">
                 {navItemsConfig.map((item) => {
                   const isActive = location.pathname === item.path;
@@ -305,15 +356,16 @@ export default function Dashboard({
                     <button
                       key={item.path}
                       onClick={() => navigate(item.path)}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+                      title={sidebarCollapsed ? item.label : undefined}
+                      className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-1' : 'justify-between px-2.5'} py-1.5 rounded text-xs font-medium transition-colors cursor-pointer ${
                         isActive
                           ? 'bg-neutral-100 text-black font-semibold'
                           : 'text-neutral-600 hover:bg-neutral-50 hover:text-black'
                       }`}
                     >
                       <span className="flex items-center gap-2.5">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-neutral-400'}`} />
-                        {item.label}
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-black' : 'text-neutral-400'}`} />
+                        {!sidebarCollapsed && <span>{item.label}</span>}
                       </span>
                     </button>
                   );
@@ -323,9 +375,15 @@ export default function Dashboard({
 
           </div>
 
-          <div className="p-4 border-t border-[#EAEAEA] font-mono text-[10px] text-neutral-400 flex flex-col gap-1">
-            <span>GRID NODES ACTIVE: 5</span>
-            <span>SECURE TUNNEL: SSL_TLS_256</span>
+          <div className={`p-4 border-t border-[#EAEAEA] font-mono text-[10px] text-neutral-400 flex flex-col gap-1 ${sidebarCollapsed ? 'items-center text-center px-1' : ''}`}>
+            {sidebarCollapsed ? (
+              <span className="font-bold text-black bg-neutral-100 rounded px-1.5 py-0.5" title="5 Grid Nodes Active">5N</span>
+            ) : (
+              <>
+                <span>GRID NODES ACTIVE: 5</span>
+                <span>SECURE TUNNEL: SSL_TLS_256</span>
+              </>
+            )}
           </div>
         </aside>
 

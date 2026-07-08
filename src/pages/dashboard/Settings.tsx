@@ -42,7 +42,7 @@ export default function Settings({
         <div>
           <button
             onClick={handleSaveSettings}
-            className="px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded transition-colors flex items-center gap-1.5"
+            className="px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-semibold rounded transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Save className="w-4 h-4" /> Save Settings Parameters
           </button>
