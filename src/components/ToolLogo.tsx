@@ -41,10 +41,10 @@ export default function ToolLogo({ id, className = "w-5 h-5" }: ToolLogoProps) {
     );
   }
 
-  if (normId.includes('zapier') || normId === 'zapier') {
+  if (normId.includes('zapier') || normId === 'zapier' || normId.includes('arxodyne') || normId === 'arxodyne') {
     return (
-      <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Zapier">
-        <path d="M19,3H5A2,2,0,0,0,3,5V19a2,2,0,0,0,2,2H19a2,2,0,0,0,2-2V5A2,2,0,0,0,19,3Zm-3,8H13v6H11V11H8V9h8Z" fill="#FF4F00" />
+      <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Arxodyne">
+        <path d="M12 1.5l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.8-5.4 2.8 1-6.1-4.4-4.3 6.1-.9z" fill="#FF4F00" />
       </svg>
     );
   }
@@ -82,6 +82,14 @@ export default function ToolLogo({ id, className = "w-5 h-5" }: ToolLogoProps) {
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Notion">
         <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 3v12h2.5l3.5-6.5V18H16V6h-2.5L10 12.5V6H6z" />
+      </svg>
+    );
+  }
+
+  if (normId.includes('supabase') || normId === 'supabase') {
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Supabase">
+        <path d="M21.4 11.6l-8.3-10c-.4-.5-1.1-.3-1.2.3l-1 6.8H4.6c-.6 0-1 .6-.7 1.1l8.3 10c.4.5 1.1.3 1.2-.3l1-6.8h6.3c.6 0 1-.6.7-1.1z" fill="#3ECF8E" />
       </svg>
     );
   }

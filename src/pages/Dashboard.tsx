@@ -17,7 +17,8 @@ import {
   AlertOctagon,
   ShieldAlert,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Database
 } from 'lucide-react';
 import { Agent, Decision, ConnectedTool, AlertItem, SystemGoal } from '../types';
 
@@ -178,6 +179,12 @@ export default function Dashboard({
       path: '/dashboard/integrations',
       label: 'Connected Tools',
       icon: Zap,
+      badge: null
+    },
+    {
+      path: '/dashboard/supabase',
+      label: 'Supabase Sync',
+      icon: Database,
       badge: null
     },
     {

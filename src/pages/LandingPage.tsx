@@ -195,7 +195,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* 1.2 HERO SECTION (Zapier style hero with huge friendly headings & orange buttons) */}
+      {/* 1.2 HERO SECTION (Arxodyne style hero with huge friendly headings & orange buttons) */}
       <section className="relative overflow-hidden bg-brand-cream pt-16 pb-24 md:pt-24 md:pb-32 border-b border-brand-sand">
         <div className="absolute inset-0 bg-[radial-gradient(#e9e2d7_1px,transparent_1px)] [background-size:24px_24px] opacity-60"></div>
         
@@ -294,7 +294,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Zapier-style 4-Card Grid */}
+          {/* Arxodyne-style 4-Card Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Card 1 */}
@@ -632,7 +632,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 1.10 PRICING SECTION (Same card layout, updated with custom Zapier beige styling & orange CTAs) */}
+      {/* 1.10 PRICING SECTION (Same card layout, updated with custom Arxodyne beige styling & orange CTAs) */}
       <section id="pricing-grid" className="py-24 max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
           <span className="text-brand-orange text-xs font-extrabold uppercase tracking-widest block mb-3">GRID PRICING</span>
@@ -660,7 +660,7 @@ export default function LandingPage() {
                     : 'border-brand-sand bg-white hover:border-brand-stone shadow-sm'
                 }`}
               >
-                {/* Visual Arrow indicator for MOST POPULAR styled beautifully in Zapier orange */}
+                {/* Visual Arrow indicator for MOST POPULAR styled beautifully in Arxodyne orange */}
                 {plan.featured && (
                   <div className="absolute top-4 right-5 flex items-center gap-1.5 text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-full">
                     <span className="text-[9px] font-sans font-extrabold uppercase tracking-wider">MOST POPULAR</span>
@@ -819,7 +819,7 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-6 border-t border-brand-sand pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-xs font-semibold text-brand-stone">
-            © 2026 Arxodyne Technologies, Inc. All rights reserved. Zapier is a trademark of Zapier, Inc. This application is inspired by Zapier's design language.
+            © 2026 Arxodyne Technologies, Inc. All rights reserved. Arxodyne Kernel, Integration Orchestrator, and Arxodyne logo are registered trademarks of Arxodyne Technologies, Inc.
           </div>
 
           <div className="font-mono text-[11px] text-brand-stone flex items-center gap-1.5">

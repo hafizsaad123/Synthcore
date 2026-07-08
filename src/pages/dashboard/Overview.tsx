@@ -620,7 +620,7 @@ export default function Overview({
                   <option value="Claude">Anthropic Claude 3.5 Sonnet</option>
                   <option value="OpenAI">OpenAI GPT-4o</option>
                   <option value="Gemini">Google Gemini 1.5 Pro</option>
-                  <option value="Zapier">Zapier Automation Engine</option>
+                  <option value="Arxodyne">Arxodyne Integration Engine</option>
                 </select>
               </div>
 

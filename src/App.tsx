@@ -21,6 +21,7 @@ import Alerts from './pages/dashboard/Alerts';
 import Integrations from './pages/dashboard/Integrations';
 import Settings from './pages/dashboard/Settings';
 import SuperAdmin from './pages/dashboard/SuperAdmin';
+import SupabaseSync from './pages/dashboard/Supabase';
 
 // Dynamic Core Site Pages
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -163,6 +164,12 @@ function AppContent() {
               setConnectedTools={setConnectedTools}
               showToast={showToast}
             />
+          }
+        />
+        <Route
+          path="supabase"
+          element={
+            <SupabaseSync />
           }
         />
         <Route
